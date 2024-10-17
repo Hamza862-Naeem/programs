@@ -1,7 +1,29 @@
 import 'dart:io';
 
+import 'loanBank.dart';
+
 class Bank {
-  double balance = 0.0;
+  double balance = 100.0;
+  double interestRate = 0.05; // 5% annual interest
+  String accountType; // "savings" or "current"
+
+  Bank(this.accountType);
+
+  void calculateInterest() {
+    if (accountType == "savings") {
+      stdout.write('Enter the number of years to calculate interest: ');
+      int years = int.parse(stdin.readLineSync()!);
+
+      if (years >= 1) {
+        double interest = balance * interestRate * years;
+        print('Interest earned in $years years: \$${interest.toStringAsFixed(2)}');
+      } else {
+        print('Interest can only be calculated for one year or more.');
+      }
+    } else {
+      print('Interest calculation is only applicable to savings accounts.');
+    }
+  }
 
   void checkBalance() {
     print('Your current balance is \$${balance.toStringAsFixed(2)}');
@@ -32,13 +54,13 @@ class Bank {
     }
   }
 }
-
 void main() {
-  String correctPassword = '1234'; // You can set this to any password
-  int maxAttempts = 3; // Number of attempts allowed
+  stdout.write('Enter your name: ');
+  String? name = stdin.readLineSync();
+  String correctPassword = '1234'; 
+  int maxAttempts = 3; 
   bool accessGranted = false;
 
-  // Password check
   for (int attempts = 0; attempts < maxAttempts; attempts++) {
     stdout.write('Enter your password: ');
     String? inputPassword = stdin.readLineSync();
@@ -54,10 +76,19 @@ void main() {
 
   if (!accessGranted) {
     print('Too many failed attempts. Exiting...');
-    return; // Exits the program if max attempts are exceeded
+    return; 
   }
 
-  var bank = Bank();
+  stdout.write('Enter account type (savings/current): ');
+  String? accountType = stdin.readLineSync();
+
+  if (accountType != "savings" && accountType != "current") {
+    print('Invalid account type. Exiting...');
+    return;
+  }
+
+  var loanBank = LoanBank(accountType!);
+
   bool exit = false;
 
   while (!exit) {
@@ -65,24 +96,32 @@ void main() {
     print('1. Check Balance');
     print('2. Deposit');
     print('3. Withdraw');
-    print('4. Exit');
+    print('4. Interest calculation');
+    print('5. Loan Eligibility Check');
+    print('6. Exit');
     stdout.write('Select an option: ');
 
     String? choice = stdin.readLineSync();
 
     switch (choice) {
       case '1':
-        bank.checkBalance();
+        loanBank.checkBalance();
         break;
       case '2':
-        bank.deposit();
+        loanBank.deposit();
         break;
       case '3':
-        bank.withdraw();
+        loanBank.withdraw();
         break;
       case '4':
+        loanBank.calculateInterest();
+        break;
+      case '5':
+        loanBank.checkLoanEligibility();
+        break;
+      case '6':
         exit = true;
-        print('Exiting the banking system. Goodbye!');
+        print('Exiting the banking system. Goodbye! $name');
         break;
       default:
         print('Invalid option, please select again.');
