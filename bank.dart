@@ -21,7 +21,7 @@ class Bank {
   void withdraw() {
     stdout.write('Enter amount to withdraw: ');
     double withdrawAmount = double.parse(stdin.readLineSync()!);
-    
+
     if (withdrawAmount <= balance && withdrawAmount > 0) {
       balance -= withdrawAmount;
       print('You have withdrawn \$${withdrawAmount.toStringAsFixed(2)}');
@@ -34,6 +34,29 @@ class Bank {
 }
 
 void main() {
+  String correctPassword = '1234'; // You can set this to any password
+  int maxAttempts = 3; // Number of attempts allowed
+  bool accessGranted = false;
+
+  // Password check
+  for (int attempts = 0; attempts < maxAttempts; attempts++) {
+    stdout.write('Enter your password: ');
+    String? inputPassword = stdin.readLineSync();
+
+    if (inputPassword == correctPassword) {
+      accessGranted = true;
+      print('Access granted.\n');
+      break;
+    } else {
+      print('Incorrect password. Try again.');
+    }
+  }
+
+  if (!accessGranted) {
+    print('Too many failed attempts. Exiting...');
+    return; // Exits the program if max attempts are exceeded
+  }
+
   var bank = Bank();
   bool exit = false;
 
