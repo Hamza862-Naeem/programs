@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'loanBank.dart';
+import 'main.dart';
 
 class Bank {
   double balance = 100.0;
@@ -53,78 +53,45 @@ class Bank {
       print('Insufficient balance. Your current balance is \$${balance.toStringAsFixed(2)}');
     }
   }
-}
-void main() {
-  stdout.write('Enter your name: ');
-  String? name = stdin.readLineSync();
-  String correctPassword = '1234'; 
-  int maxAttempts = 3; 
-  bool accessGranted = false;
 
-  for (int attempts = 0; attempts < maxAttempts; attempts++) {
-    stdout.write('Enter your password: ');
-    String? inputPassword = stdin.readLineSync();
 
-    if (inputPassword == correctPassword) {
-      accessGranted = true;
-      print('Access granted.\n');
-      break;
+  void transferFunds(Bank targetAccount, double amount) {
+    if (amount > 0 && amount <= balance) {
+      balance -= amount;
+      targetAccount.balance += amount;
+      print('Successfully transferred \$${amount.toStringAsFixed(2)} to another account.');
+    } else if (amount <= 0) {
+      print('Transfer amount must be positive.');
     } else {
-      print('Incorrect password. Try again.');
+      print('Insufficient balance for this transfer.');
     }
   }
+}
 
-  if (!accessGranted) {
-    print('Too many failed attempts. Exiting...');
-    return; 
-  }
+class LoanBank extends Bank {
+  bool previousHistory;
+  double customerWorth;
 
-  stdout.write('Enter account type (savings/current): ');
-  String? accountType = stdin.readLineSync();
+  LoanBank(String accountType)
+      : previousHistory = false, // Default values, will be updated later
+        customerWorth = 0.0,
+        super(accountType);
 
-  if (accountType != "savings" && accountType != "current") {
-    print('Invalid account type. Exiting...');
-    return;
-  }
+  void checkLoanEligibility() {
+    // Prompt for previous history
+    stdout.write('Do you have a good credit history? (yes/no): ');
+    String? historyInput = stdin.readLineSync();
+    previousHistory = historyInput?.toLowerCase() == 'yes';
 
-  var loanBank = LoanBank(accountType!);
+    // Prompt for financial worth
+    stdout.write('Enter your financial worth: ');
+    customerWorth = double.parse(stdin.readLineSync()!);
 
-  bool exit = false;
-
-  while (!exit) {
-    print('\nBanking System Menu:');
-    print('1. Check Balance');
-    print('2. Deposit');
-    print('3. Withdraw');
-    print('4. Interest calculation');
-    print('5. Loan Eligibility Check');
-    print('6. Exit');
-    stdout.write('Select an option: ');
-
-    String? choice = stdin.readLineSync();
-
-    switch (choice) {
-      case '1':
-        loanBank.checkBalance();
-        break;
-      case '2':
-        loanBank.deposit();
-        break;
-      case '3':
-        loanBank.withdraw();
-        break;
-      case '4':
-        loanBank.calculateInterest();
-        break;
-      case '5':
-        loanBank.checkLoanEligibility();
-        break;
-      case '6':
-        exit = true;
-        print('Exiting the banking system. Goodbye! $name');
-        break;
-      default:
-        print('Invalid option, please select again.');
+    // Loan eligibility logic
+    if (previousHistory && customerWorth > 50000) {
+      print('Congratulations! You are eligible for a loan.');
+    } else {
+      print('Sorry, you are not eligible for a loan.');
     }
   }
 }
